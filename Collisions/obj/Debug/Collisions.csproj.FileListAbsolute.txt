@@ -1,0 +1,9 @@
+C:\Code\Collisions\Collisions\bin\Debug\Collisions.exe.config
+C:\Code\Collisions\Collisions\obj\Debug\Collisions.csprojResolveAssemblyReference.cache
+C:\Code\Collisions\Collisions\obj\Debug\Collisions.Form1.resources
+C:\Code\Collisions\Collisions\obj\Debug\Collisions.Properties.Resources.resources
+C:\Code\Collisions\Collisions\obj\Debug\Collisions.csproj.GenerateResource.Cache
+C:\Code\Collisions\Collisions\bin\Debug\Collisions.exe
+C:\Code\Collisions\Collisions\bin\Debug\Collisions.pdb
+C:\Code\Collisions\Collisions\obj\Debug\Collisions.exe
+C:\Code\Collisions\Collisions\obj\Debug\Collisions.pdb
