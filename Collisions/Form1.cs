@@ -207,33 +207,36 @@ namespace Collisions
         {
             ClearTileState();
             Vector velocity = new Vector();
-            
+
+            int speed = 5;
+
             if (e.KeyCode == Keys.D)
             {
-                velocity.X += 5;
+                velocity.X += speed;
             }
             if (e.KeyCode == Keys.Right)
             {
-                velocity.X += 5;
+                velocity.X += speed;
             }
             if (e.KeyCode == Keys.A || e.KeyCode == Keys.Left) {
-                velocity.X -= 5;
+                velocity.X -= speed;
             }
             if (e.KeyCode == Keys.W)
             {
-                velocity.Y -= 5;
+                velocity.Y -= speed;
             }
             if (e.KeyCode == Keys.Up) {
-                velocity.Y -= 5;
+                velocity.Y -= speed;
             }
             if (e.KeyCode == Keys.S || e.KeyCode == Keys.Down)
             {
-                velocity.Y += 5;
+                velocity.Y += speed;
             }
 
             Vector playerTranslation = velocity;
 
-            CollisionResult r = collisionHandler.IsColliding(player, tileMap, velocity);
+            var r = collisionHandler.IsCollidingSimple(player, tileMap, velocity);
+            //CollisionResult r = collisionHandler.IsColliding(player, tileMap, velocity);
             if (r.WillIntersect || r.Intersect)
             {
                 playerTranslation = velocity + r.MinimumTranslationVector;

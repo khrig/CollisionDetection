@@ -13,6 +13,83 @@ namespace Collisions
             touchedTiles = new List<Tile>();
         }
 
+
+        /* 
+         * http://www.opentk.com/node/869
+         */
+        public Vector MinimumTranslation(AABB box, AABB other)
+        {
+            // Min refers to the top left corner, Max refers to the bottom right corner.
+
+            Vector amin = new Vector(box.X, box.Y);
+            Vector amax = new Vector(box.X + box.Width, box.Y + box.Height);
+            Vector bmin = new Vector(other.X, other.Y);
+            Vector bmax = new Vector(other.X + other.Width, other.Y + other.Height);
+
+            Vector mtd = new Vector();
+
+            float left = (bmin.X - amax.X);
+            float right = (bmax.X - amin.X);
+            float top = (bmin.Y - amax.Y);
+            float bottom = (bmax.Y - amin.Y);
+
+            // box dont intersect   
+            if (left > 0 || right < 0) return new Vector();
+            if (top > 0 || bottom < 0) return new Vector();
+
+            // box intersect. work out the mtd on both x and y axes.
+            if (Math.Abs(left) < right)
+                mtd.X = left;
+            else
+                mtd.X = right;
+
+            if (Math.Abs(top) < bottom)
+                mtd.Y = top;
+            else
+                mtd.Y = bottom;
+
+            // 0 the axis with the largest mtd value.
+            if (Math.Abs(mtd.X) < Math.Abs(mtd.Y))
+                mtd.Y = 0;
+            else
+                mtd.X = 0;
+            return mtd;
+        }
+
+        // Remove velocity to check after a move is done
+        public CollisionResult IsCollidingSimple(AABB box, TileMap tileMap, Vector velocity)
+        {
+            // Broad Phase
+            // -----------------
+
+            int velocityX = (int)velocity.X;
+            int velocityY = (int)velocity.Y;
+
+            AABB boxAfterVelocity = new AABB(box.X + velocityX, box.Y + velocityY, box.Width, box.Height);
+
+            // Get tiles that box is "on"
+            touchedTiles.Clear();
+            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX, box.Y + velocityY)); // Top Left
+            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX + box.Width, box.Y + velocityY)); // Top Right
+            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX, box.Y + box.Height + velocityY)); // Bottom Left
+            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX + box.Width, box.Y + velocityY + box.Height)); // Bottom Right
+
+            CollisionResult result = new CollisionResult { Intersect = false, WillIntersect = false };
+            foreach (Tile tile in touchedTiles) {
+                tile.Intersected = true;
+                if (tile.IsSolid && tile.Shape == Shape.Box) {
+                    tile.Collided = true;
+
+                    var trans = MinimumTranslation(boxAfterVelocity, tile.AABB);
+                    result.Intersect = true;
+                    result.WillIntersect = true;
+                    result.MinimumTranslationVector = trans;
+                    return result;
+                }
+            }
+            return result;
+        }
+
         public CollisionResult IsColliding(AABB box, TileMap tileMap, Vector velocity) {
 
             // Broad Phase
