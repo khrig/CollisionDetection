@@ -27,8 +27,8 @@ namespace Collisions
         }
 
         public Tile PositionToTile(int x, int y) {
-            var tileX = x / 32;
-            var tileY = y / 32;
+            var tileX = (int)Math.Floor((float)x / 32);
+            var tileY = (int)Math.Floor((float)y / 32);
             return Tiles[tileX, tileY];
         }
     }
