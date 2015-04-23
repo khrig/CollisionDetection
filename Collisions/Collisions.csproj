@@ -46,6 +46,8 @@
   <ItemGroup>
     <Compile Include="AABB.cs" />
     <Compile Include="CollisionDetection.cs" />
+    <Compile Include="CollisionHandlerSATAABB.cs" />
+    <Compile Include="CollisionResult.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
