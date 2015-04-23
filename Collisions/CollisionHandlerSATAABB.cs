@@ -8,6 +8,47 @@ namespace Collisions
 {
     public class CollisionHandler
     {
+        List<Tile> touchedTiles;
+        public CollisionHandler() {
+            touchedTiles = new List<Tile>();
+        }
+
+        public CollisionResult IsColliding(AABB box, TileMap tileMap, Vector velocity) {
+
+            // Broad Phase
+            // -----------------
+
+            // Get tiles that box is "on"
+            int velocityX = (int)velocity.X;
+            int velocityY = (int)velocity.Y;
+            touchedTiles.Clear();
+            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX, box.Y + velocityY)); // Top Left
+            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX + box.Width, box.Y + velocityY)); // Top Right
+            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX, box.Y + box.Height + velocityY)); // Bottom Left
+            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX + box.Width, box.Y + velocityY + box.Height)); // Bottom Right
+
+
+            // Narrow phase
+            // -----------------
+
+            float highestMagnitude = 0;
+            CollisionResult result = new CollisionResult { Intersect = false, WillIntersect = false };
+            foreach (Tile tile in touchedTiles) {
+                tile.Intersected = true;
+                if (tile.IsSolid && tile.Shape == Shape.Box) {
+                    tile.Collided = true;
+
+                    var collision = AABBtoAABB(box, tile.AABB, velocity);
+                    if (collision.Intersect || collision.WillIntersect)
+                    {
+                        if (collision.MinimumTranslationVector.Magnitude > highestMagnitude)
+                            result = collision;
+                    }
+                }
+            }
+            return result;
+        }
+
         // Check if polygon A is going to collide with polygon B for the given velocity
         public CollisionResult AABBtoAABB(AABB a, AABB b, Vector velocity)
         {

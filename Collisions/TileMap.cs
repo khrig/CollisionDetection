@@ -24,6 +24,9 @@ namespace Collisions
                         Tiles[x, y].IsSolid = true;
                 }
             }
+
+            Tiles[6, 8].IsSolid = true;
+            Tiles[5, 7].IsSolid = true;
         }
 
         public Tile PositionToTile(int x, int y) {

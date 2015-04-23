@@ -65,13 +65,12 @@ namespace Collisions
             collisionDetection = new CollisionDetection();
             collisionHandler = new CollisionHandler();
             tileMap = new TileMap(tileSize, gridWidth, gridHeight);
-            player = new AABB(0, 0, tileSize, tileSize);
+            player = new AABB(50, 50, tileSize, tileSize);
             obstacle = new AABB(100, 100, tileSize, tileSize);
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            ClearTileState();
             /*
             Vector p1;
             Vector p2;
@@ -91,8 +90,8 @@ namespace Collisions
                     e.Graphics.DrawLine(new Pen(Color.Black), p1, p2);
                 }
             }
-
-            /*
+            */
+            
             for (int x = 0; x < gridWidth; x++)
             {
                 for (int y = 0; y < gridHeight; y++)
@@ -115,13 +114,10 @@ namespace Collisions
                     }
                 }
             }
-            */
+            
             e.Graphics.FillRectangle(blueBrush, player.X, player.Y, player.Width, player.Height);
             e.Graphics.DrawRectangle(playerBorder, player.X, player.Y, player.Width, player.Height);
-
-            e.Graphics.FillRectangle(brush, obstacle.X, obstacle.Y, obstacle.Width, obstacle.Height);
-            e.Graphics.DrawRectangle(borderPen, obstacle.X, obstacle.Y, obstacle.Width, obstacle.Height);
-
+            
             Invalidate();
         }
 
@@ -209,6 +205,7 @@ namespace Collisions
         
         void Form1_KeyDown(object sender, KeyEventArgs e)
         {
+            ClearTileState();
             Vector velocity = new Vector();
             
             if (e.KeyCode == Keys.D)
@@ -236,11 +233,10 @@ namespace Collisions
 
             Vector playerTranslation = velocity;
 
-            CollisionResult r = collisionHandler.AABBtoAABB(player, obstacle, velocity);
+            CollisionResult r = collisionHandler.IsColliding(player, tileMap, velocity);
             if (r.WillIntersect || r.Intersect)
             {
                 playerTranslation = velocity + r.MinimumTranslationVector;
-                
             }
 
             /*
