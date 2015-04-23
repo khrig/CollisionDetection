@@ -13,6 +13,33 @@ namespace Collisions
             touchedTiles = new List<Tile>();
         }
 
+        public CollisionResult ReallySimpleBeforeMoveAABB(AABB box, TileMap tileMap, Vector velocity)
+        {
+            int velocityX = (int)velocity.X;
+            int velocityY = (int)velocity.Y;
+
+            touchedTiles.Clear();
+            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX, box.Y + velocityY)); // Top Left
+            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX + box.Width, box.Y + velocityY)); // Top Right
+            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX, box.Y + box.Height + velocityY)); // Bottom Left
+            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX + box.Width, box.Y + velocityY + box.Height)); // Bottom Right
+
+            CollisionResult result = new CollisionResult { Intersect = false, WillIntersect = false, MinimumTranslationVector = velocity };
+            foreach (Tile tile in touchedTiles) {
+                tile.Intersected = true;
+                if (tile.IsSolid && tile.Shape == Shape.Box) {
+                    tile.Collided = true;
+                    result.Intersect = true;
+                    result.WillIntersect = true;
+                    if(velocityX > 0)
+                        result.MinimumTranslationVector = new Vector(tile.AABB.X -1, 0);
+                    if (velocityX < 0)
+                        result.MinimumTranslationVector = new Vector(Math.Abs(tile.AABB.X + tile.AABB.Width - box.X), 0);
+                }
+            }
+            return result;
+        }
+
 
         /* 
          * http://www.opentk.com/node/869

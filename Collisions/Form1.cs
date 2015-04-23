@@ -235,7 +235,9 @@ namespace Collisions
 
             Vector playerTranslation = velocity;
 
-            var r = collisionHandler.IsCollidingSimple(player, tileMap, velocity);
+            var r = collisionHandler.ReallySimpleBeforeMoveAABB(player, tileMap, velocity);
+
+            //var r = collisionHandler.IsCollidingSimple(player, tileMap, velocity);
             //CollisionResult r = collisionHandler.IsColliding(player, tileMap, velocity);
             if (r.WillIntersect || r.Intersect)
             {
