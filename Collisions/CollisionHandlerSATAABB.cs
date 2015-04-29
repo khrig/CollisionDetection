@@ -12,35 +12,7 @@ namespace Collisions
         public CollisionHandler() {
             touchedTiles = new List<Tile>();
         }
-
-        public CollisionResult ReallySimpleBeforeMoveAABB(AABB box, TileMap tileMap, Vector velocity)
-        {
-            int velocityX = (int)velocity.X;
-            int velocityY = (int)velocity.Y;
-
-            touchedTiles.Clear();
-            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX, box.Y + velocityY)); // Top Left
-            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX + box.Width, box.Y + velocityY)); // Top Right
-            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX, box.Y + box.Height + velocityY)); // Bottom Left
-            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX + box.Width, box.Y + velocityY + box.Height)); // Bottom Right
-
-            CollisionResult result = new CollisionResult { Intersect = false, WillIntersect = false, MinimumTranslationVector = velocity };
-            foreach (Tile tile in touchedTiles) {
-                tile.Intersected = true;
-                if (tile.IsSolid && tile.Shape == Shape.Box) {
-                    tile.Collided = true;
-                    result.Intersect = true;
-                    result.WillIntersect = true;
-                    if(velocityX > 0)
-                        result.MinimumTranslationVector = new Vector(tile.AABB.X -1, 0);
-                    if (velocityX < 0)
-                        result.MinimumTranslationVector = new Vector(Math.Abs(tile.AABB.X + tile.AABB.Width - box.X), 0);
-                }
-            }
-            return result;
-        }
-
-
+        
         /* 
          * http://www.opentk.com/node/869
          */
@@ -83,39 +55,6 @@ namespace Collisions
             return mtd;
         }
 
-        // Remove velocity to check after a move is done
-        public CollisionResult IsCollidingSimple(AABB box, TileMap tileMap, Vector velocity)
-        {
-            // Broad Phase
-            // -----------------
-
-            int velocityX = (int)velocity.X;
-            int velocityY = (int)velocity.Y;
-
-            AABB boxAfterVelocity = new AABB(box.X + velocityX, box.Y + velocityY, box.Width, box.Height);
-
-            // Get tiles that box is "on"
-            touchedTiles.Clear();
-            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX, box.Y + velocityY)); // Top Left
-            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX + box.Width, box.Y + velocityY)); // Top Right
-            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX, box.Y + box.Height + velocityY)); // Bottom Left
-            touchedTiles.Add(tileMap.PositionToTile(box.X + velocityX + box.Width, box.Y + velocityY + box.Height)); // Bottom Right
-
-            CollisionResult result = new CollisionResult { Intersect = false, WillIntersect = false };
-            foreach (Tile tile in touchedTiles) {
-                tile.Intersected = true;
-                if (tile.IsSolid && tile.Shape == Shape.Box) {
-                    tile.Collided = true;
-
-                    var trans = MinimumTranslation(boxAfterVelocity, tile.AABB);
-                    result.Intersect = true;
-                    result.WillIntersect = true;
-                    result.MinimumTranslationVector = trans;
-                    return result;
-                }
-            }
-            return result;
-        }
 
         public CollisionResult IsColliding(AABB box, TileMap tileMap, Vector velocity) {
 
@@ -153,18 +92,21 @@ namespace Collisions
             return result;
         }
 
+        public CollisionResult AABBtoAABB(AABB a, AABB b, Vector velocity) {
+            return PolygonCollision(ConvertToPolygon(a), ConvertToPolygon(b), velocity);
+        }
+
+        private Polygon ConvertToPolygon(AABB a) {
+            throw new NotImplementedException();
+        }
+
         // Check if polygon A is going to collide with polygon B for the given velocity
-        public CollisionResult AABBtoAABB(AABB a, AABB b, Vector velocity)
-        {
+        
+        public CollisionResult PolygonCollision(Polygon polygonA, Polygon polygonB, Vector velocity) {
             CollisionResult result = new CollisionResult { Intersect = true, WillIntersect = true };
 
-            int edgeCountA = 4;
-            int edgeCountB = 4;
-
-            /*
             int edgeCountA = polygonA.Edges.Count;
             int edgeCountB = polygonB.Edges.Count;
-             * */
             float minIntervalDistance = float.PositiveInfinity;
             Vector translationAxis = new Vector();
             Vector edge;
@@ -174,11 +116,11 @@ namespace Collisions
             {
                 if (edgeIndex < edgeCountA)
                 {
-                    edge = a.Edges[edgeIndex];
+                    edge = polygonA.Edges[edgeIndex];
                 }
                 else
                 {
-                    edge = b.Edges[edgeIndex - edgeCountA];
+                    edge = polygonB.Edges[edgeIndex - edgeCountA];
                 }
 
                 // ===== 1. Find if the polygons are currently intersecting =====
@@ -189,8 +131,8 @@ namespace Collisions
 
                 // Find the projection of the polygon on the current axis
                 float minA = 0; float minB = 0; float maxA = 0; float maxB = 0;
-                ProjectPolygon(axis, a, ref minA, ref maxA);
-                ProjectPolygon(axis, b, ref minB, ref maxB);
+                ProjectPolygon(axis, polygonA, ref minA, ref maxA);
+                ProjectPolygon(axis, polygonB, ref minB, ref maxB);
 
                 // Check if the polygon projections are currentlty intersecting
                 if (IntervalDistance(minA, maxA, minB, maxB) > 0) result.Intersect = false;
@@ -226,7 +168,7 @@ namespace Collisions
                     minIntervalDistance = intervalDistance;
                     translationAxis = axis;
 
-                    Vector d = a.Center - b.Center;
+                    Vector d = polygonA.Center - polygonB.Center;
                     if (d.DotProduct(translationAxis) < 0) translationAxis = -translationAxis;
                 }
             }
@@ -251,21 +193,22 @@ namespace Collisions
         }
 
         // Calculate the projection of a polygon on an axis and returns it as a [min, max] interval
-        public void ProjectPolygon(Vector axis, AABB aabb, ref float min, ref float max)
+        public void ProjectPolygon(Vector axis, Polygon polygon, ref float min, ref float max)
         {
             // To project a point on an axis use the dot product
-            float d = axis.DotProduct(aabb.Points[0]);
+            float d = axis.DotProduct(polygon.Points[0]);
             min = d;
             max = d;
-            for (int i = 0; i < aabb.Points.Count; i++)
+            for (int i = 0; i < polygon.Points.Count; i++)
             {
-                d = aabb.Points[i].DotProduct(axis);
-                if (d < min) {
+                d = polygon.Points[i].DotProduct(axis);
+                if (d < min)
+                {
                     min = d;
-                } else {
-                    if (d > max) {
-                        max = d;
-                    }
+                }
+                else if (d > max)
+                {
+                    max = d;
                 }
             }
         }

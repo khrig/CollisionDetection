@@ -7,3 +7,12 @@ C:\Code\Collisions\Collisions\bin\Debug\Collisions.exe
 C:\Code\Collisions\Collisions\bin\Debug\Collisions.pdb
 C:\Code\Collisions\Collisions\obj\Debug\Collisions.exe
 C:\Code\Collisions\Collisions\obj\Debug\Collisions.pdb
+C:\Code\CollisionDetection\Collisions\bin\Debug\Collisions.exe.config
+C:\Code\CollisionDetection\Collisions\bin\Debug\Collisions.exe
+C:\Code\CollisionDetection\Collisions\bin\Debug\Collisions.pdb
+C:\Code\CollisionDetection\Collisions\obj\Debug\Collisions.csprojResolveAssemblyReference.cache
+C:\Code\CollisionDetection\Collisions\obj\Debug\Collisions.Form1.resources
+C:\Code\CollisionDetection\Collisions\obj\Debug\Collisions.Properties.Resources.resources
+C:\Code\CollisionDetection\Collisions\obj\Debug\Collisions.csproj.GenerateResource.Cache
+C:\Code\CollisionDetection\Collisions\obj\Debug\Collisions.exe
+C:\Code\CollisionDetection\Collisions\obj\Debug\Collisions.pdb

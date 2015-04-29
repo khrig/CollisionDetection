@@ -41,26 +41,26 @@ namespace Collisions
             this.KeyDown += Form1_KeyDown;
             this.Paint += Form1_Paint;
 
-            //Polygon p = new Polygon();
-            //p.Points.Add(new Vector(0, 0));
-            //p.Points.Add(new Vector(32, 0));
-            //p.Points.Add(new Vector(32, 32));
-            //p.Points.Add(new Vector(0, 32));
+            Polygon p = new Polygon();
+            p.Points.Add(new Vector(0, 0));
+            p.Points.Add(new Vector(32, 0));
+            p.Points.Add(new Vector(32, 32));
+            p.Points.Add(new Vector(0, 32));
 
-            //polygons.Add(p);
+            polygons.Add(p);
 
-            //p = new Polygon();
-            //p.Points.Add(new Vector(0, 0));
-            //p.Points.Add(new Vector(32, 0));
-            //p.Points.Add(new Vector(32, 32));
-            //p.Points.Add(new Vector(0, 32));
-            //p.Offset(100, 100);
+            p = new Polygon();
+            p.Points.Add(new Vector(0, 0));
+            p.Points.Add(new Vector(32, 0));
+            p.Points.Add(new Vector(32, 32));
+            p.Points.Add(new Vector(0, 32));
+            p.Offset(100, 100);
 
-            //polygons.Add(p);
+            polygons.Add(p);
 
-            //foreach (Polygon polygon in polygons) polygon.BuildEdges();
+            foreach (Polygon polygon in polygons) polygon.BuildEdges();
 
-            //playerPoly = polygons[0];
+            playerPoly = polygons[0];
 
             collisionDetection = new CollisionDetection();
             collisionHandler = new CollisionHandler();
@@ -69,8 +69,8 @@ namespace Collisions
             obstacle = new AABB(100, 100, tileSize, tileSize);
         }
 
-        private void Form1_Paint(object sender, PaintEventArgs e)
-        {
+        //private void Form1_Paint(object sender, PaintEventArgs e)
+        //{
             /*
             Vector p1;
             Vector p2;
@@ -92,60 +92,58 @@ namespace Collisions
             }
             */
             
-            for (int x = 0; x < gridWidth; x++)
-            {
-                for (int y = 0; y < gridHeight; y++)
-                {
-                    if (x == 0 || x == gridWidth - 1 || y == 0 || y == gridHeight - 1)
-                        tileMap.Tiles[x, y].IsSolid = true;
-
-                    if (tileMap.Tiles[x, y].Collided)
-                    {
-                        e.Graphics.DrawRectangle(collidedPen, x * tileSize, y * tileSize, tileSize, tileSize);
-                    }
-                    else if (tileMap.Tiles[x, y].Intersected)
-                    {
-                        e.Graphics.DrawRectangle(intersectedPen, x * tileSize, y * tileSize, tileSize, tileSize);
-                    }
-                    else if (tileMap.Tiles[x, y].IsSolid)
-                    {
-                        e.Graphics.FillRectangle(brush, x * tileSize, y * tileSize, tileSize, tileSize);
-                        e.Graphics.DrawRectangle(borderPen, x * tileSize, y * tileSize, tileSize, tileSize);
-                    }
-                }
-            }
-            
-            e.Graphics.FillRectangle(blueBrush, player.X, player.Y, player.Width, player.Height);
-            e.Graphics.DrawRectangle(playerBorder, player.X, player.Y, player.Width, player.Height);
-            
-            Invalidate();
-        }
-
-        //private void Form1_Paint(object sender, PaintEventArgs e) {
-        //    Vector polygonATranslation = new Vector();
-
-        //    Vector p1;
-        //    Vector p2;
-        //    foreach (Polygon polygon in polygons)
+        //    for (int x = 0; x < gridWidth; x++)
         //    {
-        //        for (int i = 0; i < polygon.Points.Count; i++)
+        //        for (int y = 0; y < gridHeight; y++)
         //        {
-        //            p1 = polygon.Points[i];
-        //            if (i + 1 >= polygon.Points.Count)
+        //            if (x == 0 || x == gridWidth - 1 || y == 0 || y == gridHeight - 1)
+        //                tileMap.Tiles[x, y].IsSolid = true;
+
+        //            if (tileMap.Tiles[x, y].Collided)
         //            {
-        //                p2 = polygon.Points[0];
+        //                e.Graphics.DrawRectangle(collidedPen, x * tileSize, y * tileSize, tileSize, tileSize);
         //            }
-        //            else
+        //            else if (tileMap.Tiles[x, y].Intersected)
         //            {
-        //                p2 = polygon.Points[i + 1];
+        //                e.Graphics.DrawRectangle(intersectedPen, x * tileSize, y * tileSize, tileSize, tileSize);
         //            }
-        //            e.Graphics.DrawLine(new Pen(Color.Black), p1, p2);
+        //            else if (tileMap.Tiles[x, y].IsSolid)
+        //            {
+        //                e.Graphics.FillRectangle(brush, x * tileSize, y * tileSize, tileSize, tileSize);
+        //                e.Graphics.DrawRectangle(borderPen, x * tileSize, y * tileSize, tileSize, tileSize);
+        //            }
         //        }
         //    }
-
+            
+        //    e.Graphics.FillRectangle(blueBrush, player.X, player.Y, player.Width, player.Height);
+        //    e.Graphics.DrawRectangle(playerBorder, player.X, player.Y, player.Width, player.Height);
             
         //    Invalidate();
         //}
+
+        private void Form1_Paint(object sender, PaintEventArgs e) {
+            Vector polygonATranslation = new Vector();
+
+            Vector p1;
+            Vector p2;
+            foreach (Polygon polygon in polygons)
+            {
+                for (int i = 0; i < polygon.Points.Count; i++)
+                {
+                    p1 = polygon.Points[i];
+                    if (i + 1 >= polygon.Points.Count)
+                    {
+                        p2 = polygon.Points[0];
+                    }
+                    else
+                    {
+                        p2 = polygon.Points[i + 1];
+                    }
+                    e.Graphics.DrawLine(new Pen(Color.Black), p1, p2);
+                }
+            }    
+            Invalidate();
+        }
 
         //private void Form1_Paint(object sender, PaintEventArgs e) {
         //    using (Graphics graphics = CreateGraphics())
@@ -208,7 +206,7 @@ namespace Collisions
             ClearTileState();
             Vector velocity = new Vector();
 
-            int speed = 5;
+            int speed = 14;
 
             if (e.KeyCode == Keys.D)
             {
@@ -235,21 +233,22 @@ namespace Collisions
 
             Vector playerTranslation = velocity;
 
-            var r = collisionHandler.ReallySimpleBeforeMoveAABB(player, tileMap, velocity);
+            //var r = collisionHandler.ReallySimpleBeforeMoveAABB(player, tileMap, velocity);
 
             //var r = collisionHandler.IsCollidingSimple(player, tileMap, velocity);
             //CollisionResult r = collisionHandler.IsColliding(player, tileMap, velocity);
-            if (r.WillIntersect || r.Intersect)
-            {
-                playerTranslation = velocity + r.MinimumTranslationVector;
-            }
+            //if (r.WillIntersect || r.Intersect)
+            //{
+            //    playerTranslation = velocity + r.MinimumTranslationVector;
+            //}
 
-            /*
             foreach (Polygon polygon in polygons)
             {
                 if (polygon == playerPoly) continue;
 
-                CollisionResult r = collisionHandler.AABBtoAABB(player, obstacle, velocity);
+                var r = collisionDetection.PolygonCollision(playerPoly, polygon, velocity);
+                
+                //CollisionResult r = collisionHandler.AABBtoAABB(player, obstacle, velocity);
 
                 if (r.WillIntersect)
                 {
@@ -257,8 +256,8 @@ namespace Collisions
                     break;
                 }
             }
-            */
 
+            playerPoly.Offset(playerTranslation);
             player.Offset(playerTranslation);
         }
     }
